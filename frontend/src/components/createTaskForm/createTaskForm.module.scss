@@ -1,0 +1,29 @@
+.task {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  background-color: #e2f8ff;
+  padding: 55px;
+  margin: 45px;
+  border-radius: 20px;
+
+  .header {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    align-content: center;
+    margin-bottom: 20px;
+    gap: 20px
+  }
+
+  .form {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    align-content: center;
+    gap: 10px;
+
+    button {
+      margin-top: 20px;
+      width: 250px;
+    }
+  }
+}

@@ -1,0 +1,21 @@
+.auth {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  grid-template-columns: min-content 1fr;
+  
+  .auth-window {
+    background-color: #e2f8ff;
+    padding: 55px;
+    margin: 45px;
+    border-radius: 20px;
+    display: grid;
+    align-items: center;
+    gap: 20px;
+    width: max-content;
+  }
+
+  .select {
+    margin: 40px;
+  }
+}

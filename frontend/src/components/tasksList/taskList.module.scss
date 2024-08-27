@@ -1,0 +1,32 @@
+.task-list-page {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  background-color: #e2f8ff;
+  padding: 55px;
+  margin: 45px;
+  border-radius: 20px;
+}
+
+.task-list {
+  display: grid;
+  gap: 20px;
+}
+
+.task-list-header {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+  margin-top: 30px;
+
+  width: 1fr;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px
+}
+
+.task-first-str {
+  display: grid;
+  grid-template-columns: 1fr max-content max-content;
+  gap: 20px;
+}

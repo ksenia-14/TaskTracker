@@ -1,0 +1,15 @@
+.task-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 45px;
+  justify-items: center;
+  gap: 5px;
+
+  .block {
+    background-color: #e2f8ff;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+
+  }
+}
