@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.2
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tasktracker_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data/
+      # - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+
+  nginx:
+    depends_on:
+      - api
+      - client
+    restart: always
+    build:
+      dockerfile: ./docker/nginx/Dockerfile
+      context: "./"
+    ports:
+      - "80:80"
+
+  api:
+    restart: always
+    build:
+      dockerfile: ./docker/nestjs/Dockerfile
+      context: './'
+    depends_on:
+      - postgres
+    volumes:
+      - /api/node_modules
+      - ./backend:/api
+    ports:
+      - '3001:3000'
+
+  client:
+    build:
+      dockerfile: ./docker/react/Dockerfile
+      context: "./"
+    depends_on:
+      - api # todo: might not be necessary
+    volumes:
+      - /client/node_modules
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    command: [ "npm", "run", "start" ]
+
+volumes:
+  pg_data:
