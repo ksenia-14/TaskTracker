@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Req, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { plainToInstance } from "class-transformer";
 import { TaskDto } from "src/task/dto/task-dto";
@@ -7,7 +7,6 @@ import { Task } from "src/task/entities/task.entity";
 import { Repository } from "typeorm";
 
 @Injectable()
-@UsePipes(new ValidationPipe({ transform: true }))
 export class TaskService {
   constructor(
     @InjectRepository(Task)

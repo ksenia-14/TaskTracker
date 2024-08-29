@@ -15,8 +15,8 @@ export class User {
   @Column()
   name: string
 
-  @Column()
-  role: string
+  @Column('simple-array')
+  roles: string[]
 
   @OneToMany(() => Task, (task) => task.user, { onDelete: 'SET NULL' })
   tasks: Task[]
