@@ -1,8 +1,8 @@
 import { Transform, TransformFnParams, Type } from "class-transformer"
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator"
-import { User } from "src/entities/user.entity"
+import { User } from "src/user/entities/user.entity" 
 
-export class TaskDtoUpdate {
+export class TaskDto {
   @IsNotEmpty()
   title: string
 
@@ -13,10 +13,12 @@ export class TaskDtoUpdate {
   progress: string
 
   @IsNotEmpty()
-  createdAt: Date
+  @Transform(({ value }: TransformFnParams) => value.toISOString().split('T')[0])
+  createdAt: string
 
   @IsNotEmpty()
-  executeAt: Date
+  @Transform(({ value }: TransformFnParams) => value.toISOString().split('T')[0])
+  executeAt: string
 
   @IsOptional()
   user: User

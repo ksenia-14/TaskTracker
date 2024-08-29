@@ -3,8 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { GetTasksController } from './controllers/common/get-tasks/get-tasks.controller';
-import { TasksModule } from './modules/tasks.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -25,7 +24,7 @@ import { TasksModule } from './modules/tasks.module';
       }),
       inject: [ConfigService],
     }),
-    TasksModule,
+    TaskModule,
   ],
   controllers: [AppController],
   providers: [AppService],
