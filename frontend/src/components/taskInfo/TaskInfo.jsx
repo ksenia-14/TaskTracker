@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import axios from "axios";
+import moment from 'moment';
 import style from './taskInfo.module.scss';
+import { ENDPOINTS } from '../../apiConfig';
+import { ApiContext } from '../contexts/ApiContext';
+import { useContext } from 'react';
 
 const TaskInfo = () => {
+  const { id } = useParams();
+  const [task, setTask] = useState([]);
+
+  const { axiosGetTaskById, axiosDeleteTaskById } = useContext(ApiContext);
+
   const navigate = useNavigate();
 
   const closeTask = (event) => {
@@ -10,35 +21,44 @@ const TaskInfo = () => {
   };
 
   const editTask = (event) => {
-    navigate('/admin/task-info-edit');
+    navigate(`/admin/task-edit/${id}`);
   };
 
   const openWorkLog = (event) => {
-    navigate('/admin/task-worklog');
+    navigate(`/admin/task-worklog/${id}`);
   };
 
   const deleteTask = (event) => {
+    axiosDeleteTaskById(id)
     navigate('/admin/task-list');
   };
+
+  const getTask = async (id) => {
+    const task = await axiosGetTaskById(id)
+    setTask(task)
+  }
+
+  React.useEffect(() => {
+    getTask(id)
+  }, [id])
+
   
   return (
     <div className={style["task"]}>
       <div className={style["header"]}>
-        <p>Название задачи</p>
+        <p>{task.title}</p>
         <button onClick={closeTask}>Закрыть</button>
       </div>
       <div className={style["task-info"]}>
-        <p>Тип задачи: Task</p>
-        <p>Срок выполнения: 28.08.2024</p>
+        <p>Тип задачи: {task.type}</p>
+        <p>Срок выполнения: {moment(task.executeAt).format('DD.MM.YYYY')}</p>
         <p>Статус задачи: В работе</p>
-        <p>Дата создания: 28.07.2024</p>
-        <p>Исполнитель: Иванов</p>
-        <p>Прогресс выполнения: 50%</p>
+        <p>Дата создания: {moment(task.createdAt).format('DD.MM.YYYY')}</p>
+        <p>Исполнитель: {task.user ? task.user.login : 'Не назначен'}</p>
+        <p>Прогресс выполнения: {task.progress}%</p>
 
         <p className={style["description"]}>Описание задачи:</p>
-        <p className={style["description"]}>Описание задачи задачи задачи задачи задачи задачи задачи задачи задачи
-        задачи задачи задачи задачи задачи задачи задачи
-        </p>
+        <p className={style["description"]}>{task.description}</p>
         <div className={style["buttons"]}>
           <button onClick={openWorkLog}>Журнал работ</button>
           <button onClick={editTask}>Редактировать</button>

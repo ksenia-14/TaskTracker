@@ -2,7 +2,12 @@ const API_BASE_URL = 'http://localhost/api';
 
 export const ENDPOINTS = {
   TEST: `${API_BASE_URL}/`,
-  USERS: `${API_BASE_URL}/users`,
-  POSTS: `${API_BASE_URL}/posts`,
-  COMMENTS: `${API_BASE_URL}/comments`,
+  LOGIN: `${API_BASE_URL}/auth/login`,
+  TASKS_GET_ALL: `${API_BASE_URL}/task/get-all`,
+  TASKS_CREATE: `${API_BASE_URL}/task/create`,
+  TASKS_EDIT: (id) => `${API_BASE_URL}/task/edit/${id}`,
+  TASKS_DELETE: (id) => `${API_BASE_URL}/task/delete/${id}`,
+  TASKS_GET: (id) => `${API_BASE_URL}/task/get/${id}`,
+
+  USERS_GET: `${API_BASE_URL}/user/users-list`,
 };

@@ -7,18 +7,37 @@ import style from './authorizationForm.module.scss';
 
 const AuthorizationForm = () => {
   const [role, setRole] = useState('admin');
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
 
   const navigate = useNavigate();
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
-    axios.get(ENDPOINTS.TEST);
 
-    if (role === 'admin') {
-      navigate('/admin/task-list');
-    }
-    else if (role === 'user') {
-      navigate('/user/task-list');
+    try {
+      const response = await axios.post(ENDPOINTS.LOGIN, {
+        login,
+        password,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        localStorage.clear();
+        localStorage.setItem('access_token', response.data.access_token);
+
+        if (role === 'admin') {
+          navigate('/admin/task-list');
+        } else if (role === 'user') {
+          navigate('/user/task-list');
+        }
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
     }
   };
 
@@ -37,11 +56,17 @@ const AuthorizationForm = () => {
         <input
           type="text"
           placeholder="Логин"
-          id="login" name="login"></input>
+          id="login" name="login"
+          value={login}
+          onChange={(e) => setLogin(e.target.value)}
+        ></input>
         <input
           type="password"
           placeholder="Пароль"
-          id="password" name="password"></input>
+          id="password" name="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        ></input>
         <button type="submit">Войти</button>
       </div>
     </form>

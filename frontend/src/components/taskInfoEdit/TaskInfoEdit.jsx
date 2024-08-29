@@ -1,13 +1,75 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import style from './taskInfoEdit.module.scss';
-import HomeIcon from '../icons/HomeIcon';
+import { ApiContext } from '../contexts/ApiContext';
 
 const TaskInfoEdit = () => {
+  const { id } = useParams();
+  const [task, setTask] = useState({
+    title: '',
+    type: '',
+    progress: 0,
+    createdAt: '',
+    executeAt: '',
+    user: null,
+    description: ''
+  });
+  const [taskState, setTaskState] = useState('new');
+  const [usersList, setUsersList] = useState([]);
+
+  const { axiosGetTaskById, axiosGetUsersList, axiosEditTaskById } = useContext(ApiContext);
   const navigate = useNavigate();
 
-  const saveTask = (event) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      const [taskData, usersData] = await Promise.all([
+        axiosGetTaskById(id),
+        axiosGetUsersList()
+      ]);
+      setTask(taskData);
+      setUsersList(usersData);
+      checkTaskState(taskData.progress);
+    };
+    fetchData();
+  }, [id, axiosGetTaskById, axiosGetUsersList]);
+
+  const handleChange = (field, value) => {
+    setTask(prevTask => ({
+      ...prevTask,
+      [field]: value
+    }));
+  };
+
+  const handleStateChange = (event) => {
+    const newState = event.target.value;
+    setTaskState(newState);
+    checkTaskProgress(newState);
+  };
+
+  const handleProgressChange = (event) => {
+    const newProgress = event.target.value;
+    handleChange('progress', newProgress);
+    checkTaskState(newProgress);
+  };
+
+  const checkTaskState = (progress) => {
+    setTaskState(progress === 0 ? 'new' : progress === 100 ? 'done' : 'in_process');
+  };
+
+  const checkTaskProgress = (state) => {
+    if (state === 'new') {
+      handleChange('progress', 0);
+    } else if (state === 'done') {
+      handleChange('progress', 100);
+    } else if (task.progress === 0 || task.progress === 100) {
+      handleChange('progress', 50);
+    }
+  };
+
+  const saveTask = async (event) => {
     event.preventDefault();
+    await axiosEditTaskById(id, task);
     navigate('/admin/task-list');
   };
 
@@ -15,53 +77,113 @@ const TaskInfoEdit = () => {
     event.preventDefault();
     navigate('/admin/task-list');
   };
-  
+
   return (
-    <div className={style["task"]}>
+    <form onSubmit={saveTask} className={style["task"]}>
+
       <div className={style["header"]}>
-        <p>Название задачи</p>
+        <input 
+          onChange={(e) => handleChange('title', e.target.value)} 
+          value={task.title}
+        ></input>
         <button onClick={closeTask}>Закрыть</button>
       </div>
-      <form onSubmit={saveTask} className={style["task-info"]}>
+
+      <div className={style["task-info"]}>
+
         <div>
           <span>Тип задачи: </span>
-          <select 
-            name="types" 
+          <select
+            name="types"
             id="taskEditType"
-            // value={selectedType}
-            >
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
+            value={task.type}
+            onChange={(e) => handleChange('type', e.target.value)}
+          >
+            <option value="Task">Task</option>
+            <option value="Epic">Epic</option>
+            <option value="Milestone">Milestone</option>
           </select>
         </div>
-        <p>Срок выполнения: 28.08.2024</p>
+
+        <div>
+          <span>Срок выполнения:</span>
+          <input
+            type="date"
+            value={task.executeAt}
+            onChange={(e) => handleChange('executeAt', e.target.value)}
+          ></input>
+        </div>
+
         <div>
           <span>Статус задачи: </span>
-          <select 
-            name="types" 
+          <select
+            name="types"
             id="taskStateType"
-            // value={selectedType}
-            >
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
+            value={taskState}
+            onChange={handleStateChange}
+          >
+            <option value="new">Новая</option>
+            <option value="in_process">В работе</option>
+            <option value="done">Выполнена</option>
           </select>
         </div>
-        <p>Дата создания: 28.07.2024</p>
-        <p>Исполнитель: Иванов</p>
-        <p>Прогресс выполнения: 50%</p>
 
-        <p className={style["description"]}>Описание задачи:</p>
-        <p className={style["description"]}>Описание задачи задачи задачи задачи задачи задачи задачи задачи задачи
-        задачи задачи задачи задачи задачи задачи задачи
-        </p>
+        <div>
+          <span>Дата создания:</span>
+          <input
+            type="date"
+            onChange={(e) => handleChange('createdAt', e.target.value)}
+            value={task.createdAt}
+          ></input>
+        </div>
+
+        <div>
+          <span>Исполнитель:</span>
+          <select
+            name="types"
+            id="taskUser"
+            value={task.user ? task.user.id : null}
+            onChange={(e) => handleChange('user', e.target.value)}
+          >
+            <option value={null}>Не назначен</option>
+            {usersList.map((user) => (
+              <option key={user.id} value={user.id}>{user.name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <span>Прогресс выполнения:</span>
+          <select
+            name="progress"
+            id="taskProgress"
+            value={task.progress}
+            onChange={handleProgressChange}
+          >
+            <option value="0">0%</option>
+            <option value="25">25%</option>
+            <option value="50">50%</option>
+            <option value="75">75%</option>
+            <option value="100">100%</option>
+          </select>
+        </div>
+
+        <div className={style["description"]}>
+          <p>Описание задачи:</p>
+          <textarea
+            type="textarea"
+            value={task.description}
+            onChange={(e) => handleChange('description', e.target.value)}
+          ></textarea>
+        </div>
+
         <div className={style["buttons"]}>
           <button type="submit">Сохранить</button>
           <button type="button" onClick={closeTask}>Отменить</button>
         </div>
-      </form>
-    </div>
+
+      </div>
+    </form>
   )
 }
 

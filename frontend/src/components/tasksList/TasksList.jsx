@@ -1,14 +1,31 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from "axios";
 import style from './taskList.module.scss';
 import TaskListItem from './taskListItem/TaskListItem';
+import { ENDPOINTS } from '../../apiConfig';
+import { ApiContext } from '../contexts/ApiContext';
 
 const TaskList = () => {
+  const { id } = useParams();
+  const [tasks, setTasks] = useState([]);
+
+  const { axiosGetAllTasks } = useContext(ApiContext);
+
   const navigate = useNavigate();
 
   const createNewTask = (event) => {
     navigate('/admin/create-new-task');
   };
+
+  const getTask = async (id) => {
+    const tasks = await axiosGetAllTasks(id)
+    setTasks(tasks)
+  }
+
+  React.useEffect(() => {
+    getTask(id)
+  }, [id])
 
   return (
     <div className={style["task-list-page"]}>
@@ -25,10 +42,18 @@ const TaskList = () => {
           <p>Прогресс</p>
           <p>Сроки</p>
         </div>
-        <TaskListItem />
-        <TaskListItem />
-        <TaskListItem />
-        <TaskListItem />
+        {tasks.map((task) => (
+        <TaskListItem 
+          key={task.id} 
+          id={task.id} 
+          title={task.title} 
+          type={task.type} 
+          progress={task.progress} 
+          createdAt={task.createdAt} 
+          executeAt={task.executeAt} 
+          user={task.user ? task.user.login : 'Не назначен'} 
+        />
+      ))}
       </div>
     </div>
   )
