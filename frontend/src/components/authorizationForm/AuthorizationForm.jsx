@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { ENDPOINTS } from '../../apiConfig';
+
 import style from './authorizationForm.module.scss';
 
 const AuthorizationForm = () => {
@@ -9,6 +12,7 @@ const AuthorizationForm = () => {
 
   const handleLogin = (event) => {
     event.preventDefault();
+    axios.get(ENDPOINTS.TEST);
 
     if (role === 'admin') {
       navigate('/admin/task-list');
