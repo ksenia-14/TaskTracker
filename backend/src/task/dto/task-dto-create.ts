@@ -30,4 +30,8 @@ export class TaskDtoCreate {
   @Expose()
   @IsOptional()
   user: number
+
+  @Expose()
+  @IsNotEmpty()
+  admin: number
 }

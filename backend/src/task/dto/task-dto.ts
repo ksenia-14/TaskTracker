@@ -38,4 +38,9 @@ export class TaskDto {
   @IsOptional()
   @Type(() => UserDto)
   user: UserDto
+
+  @Expose()
+  @IsNotEmpty()
+  @Type(() => UserDto)
+  admin: UserDto
 }

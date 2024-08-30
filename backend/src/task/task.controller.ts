@@ -15,21 +15,32 @@ export class TaskController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Put('create')
-  create(@Body() taskDto: TaskDtoCreate) {
-    return this.taskService.create(taskDto)
+  create(@Req() request: UserRequest, @Body() taskDto: TaskDtoCreate) {
+    const current_user = request.user as { userId: number}
+    return this.taskService.create(taskDto, current_user.userId)
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Put('edit/:id')
-  edit(@Body() taskDto: TaskDtoUpdate, @Param('id') id: number) {
+  async edit(@Req() request: UserRequest, @Body() taskDto: TaskDtoUpdate, @Param('id') id: number) {
+    const current_user = request.user as { userId: number}
+    const taskEdit = await this.taskService.getTaskById(id)
+    if (current_user.userId !== taskEdit.admin.id) {
+      return {'error': 'Not access'}
+    }
     return this.taskService.edit(taskDto, id)
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete('delete/:id')
-  delete(@Param('id') id: number) {
+  async delete(@Req() request: UserRequest, @Param('id') id: number) {
+    const current_user = request.user as { userId: number}
+    const taskEdit = await this.taskService.getTaskById(id)
+    if (current_user.userId !== taskEdit.admin.id) {
+      return {'error': 'Not access'}
+    }
     return this.taskService.deleteTaskById(id)
   }
 
@@ -40,7 +51,7 @@ export class TaskController {
     const user = request.user as { userId: number, roles: string[] }
     const roleUser = user.roles
     if (roleUser.includes('admin')) {
-      return this.taskService.getAllTasks()
+      return this.taskService.getAllTasksForAdminId(user.userId)
     } else {
       return this.taskService.getAllTasksForUserId(user.userId)
     }
@@ -55,6 +66,6 @@ export class TaskController {
     if (!roleUser.includes('admin')) {
       this.taskService.getTaskForUserById(user.userId, id)
     }
-    return this.taskService.getTaskById(id)
+    return this.taskService.getTaskForAdminById(user.userId, id)
   }
 }

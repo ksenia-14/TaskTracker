@@ -19,6 +19,9 @@ export class User {
   roles: string[]
 
   @OneToMany(() => Task, (task) => task.user, { onDelete: 'SET NULL' })
-  tasks: Task[]
+  tasks_user: Task[]
+
+  @OneToMany(() => Task, (task) => task.user, { onDelete: 'SET NULL' })
+  tasks_admin: Task[]
 }
 

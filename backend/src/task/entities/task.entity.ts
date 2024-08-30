@@ -25,8 +25,12 @@ export class Task {
   @CreateDateColumn({ name: 'execute_at' })
   executeAt: Date
 
-  @ManyToOne(() => User, (user) => user.tasks, { nullable: true })
+  @ManyToOne(() => User, (user) => user.tasks_user, { nullable: true })
   @JoinColumn({ name: 'user_id' })
   user:User
+
+  @ManyToOne(() => User, (user) => user.tasks_admin, { nullable: false })
+  @JoinColumn({ name: 'admin_id' })
+  admin:User
 }
 

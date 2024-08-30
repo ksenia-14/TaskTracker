@@ -15,7 +15,7 @@ export class TaskService {
     private readonly taskRepository: Repository<Task>,
   ) { }
 
-  async create(taskDto: TaskDtoCreate) {
+  async create(taskDto: TaskDtoCreate, id_admin: number) {
     const isExist = await this.taskRepository.findBy({
       user: { id: taskDto.user },
       title: taskDto.title
@@ -24,6 +24,9 @@ export class TaskService {
       throw new BadRequestException('Задача с таким названием уже назначена этому пользователю')
 
     taskDto.createdAt = new Date()
+    taskDto.progress = 0
+    taskDto.admin = id_admin
+
     const newTask = plainToInstance(Task, taskDto)
     const task = await this.taskRepository.save(newTask)
 
@@ -44,12 +47,12 @@ export class TaskService {
 
     await this.taskRepository.save(updatedTask);
 
-    const savedTask = await this.taskRepository.findOne({ where: { id }, relations: ['user'] })
+    const savedTask = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] })
     return plainToInstance(TaskDto, savedTask, { excludeExtraneousValues: true });
   }
 
   async getAllTasks(): Promise<TaskDto[]> {
-    const tasks = await this.taskRepository.find({ relations: ['user'] });
+    const tasks = await this.taskRepository.find({ relations: ['user', 'admin'] });
     return plainToInstance(TaskDto, tasks, { excludeExtraneousValues: true });
   }
 
@@ -57,13 +60,25 @@ export class TaskService {
     const tasks = await this.taskRepository.find({
       where: {
         user: { id: user_id }
-      }
+      },
+      relations: ['user', 'admin']
+    })
+    return plainToInstance(TaskDto, tasks, { excludeExtraneousValues: true });
+  }
+
+  async getAllTasksForAdminId(admin_id: number): Promise<TaskDto[]> {
+    const tasks = await this.taskRepository.find({
+      where: {
+        admin: { id: admin_id }
+      },
+      relations: ['user', 'admin']
     })
     return plainToInstance(TaskDto, tasks, { excludeExtraneousValues: true });
   }
 
   async getTaskById(id: number): Promise<TaskDto> {
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['user'] });
+    const task = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] });
+    console.log(task)
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
 
@@ -73,7 +88,18 @@ export class TaskService {
         id: task_id,
         user: { id: user_id }
       },
-      relations: ['user']
+      relations: ['user', 'admin']
+    });
+    return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
+  }
+
+  async getTaskForAdminById(admin_id: number, task_id: number): Promise<TaskDto> {
+    const task = await this.taskRepository.findOne({
+      where: {
+        id: task_id,
+        admin: { id: admin_id }
+      },
+      relations: ['user', 'admin']
     });
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
