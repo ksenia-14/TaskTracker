@@ -1,34 +1,70 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import style from './taskUserList.module.scss';
 import TaskUserListItem from './taskUserListItem/TaskUserListItem';
+import { ApiContext } from '../contexts/ApiContext';
 
 const TaskUserList = () => {
-  const navigate = useNavigate();
+  const { id } = useParams();
+  const [tasks, setTasks] = useState([]);
+
+  const { axiosGetAllTasks } = useContext(ApiContext);
+
+  const getTask = async (id) => {
+    const tasks = await axiosGetAllTasks(id)
+    setTasks(tasks)
+  }
+
+  React.useEffect(() => {
+    getTask(id)
+  }, [id])
 
   return (
     <div className={style["task-list"]}>
       <div className={style["block"]}>
-        <div style={{background: '#FF0000'}}>
+        <div style={{ background: '#FF0000' }}>
           <p>Создана</p>
         </div>
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
+        {tasks
+          .filter((task) => task.progress === 0)
+          .map((task) => (
+            <TaskUserListItem
+              key={task.id}
+              id={task.id}
+              title={task.title}
+              description={task.description}
+            />
+          ))}
       </div>
       <div className={style["block"]}>
-        <div style={{background: '#FFEA00'}}>
+        <div style={{ background: '#FFEA00' }}>
           <p>В работе</p>
         </div>
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
+        {tasks
+          .filter((task) => task.progress > 0 && task.progress < 100)
+          .map((task) => (
+            <TaskUserListItem
+              key={task.id}
+              id={task.id}
+              title={task.title}
+              description={task.description}
+            />
+          ))}
       </div>
       <div className={style["block"]}>
-        <div style={{background: '#2AFF00'}}>
+        <div style={{ background: '#2AFF00' }}>
           <p>Завершена</p>
         </div>
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
-        <TaskUserListItem name="Название задачи" description="Описание задачи" />
+        {tasks
+          .filter((task) => task.progress === 100)
+          .map((task) => (
+            <TaskUserListItem
+              key={task.id}
+              id={task.id}
+              title={task.title}
+              description={task.description}
+            />
+          ))}
       </div>
     </div>
   )

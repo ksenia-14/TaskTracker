@@ -6,12 +6,12 @@ const TaskUserListItem = (props) => {
   const navigate = useNavigate();
 
   const openTask = (event) => {
-    navigate('/user/task-info');
+    navigate(`/user/task-info/${props.id}`);
   };
 
   return (
     <div onClick={openTask} className={style["task-list-item"]}>
-      <h4>{props.name}</h4>
+      <h4>{props.title}</h4>
       <p>{props.description}</p>
     </div>
   )

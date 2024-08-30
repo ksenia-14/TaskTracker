@@ -49,7 +49,6 @@ const TaskInfo = () => {
   React.useEffect(() => {
     getTask(id)
   }, [id])
-
   
   return (
     <div className={style["task"]}>

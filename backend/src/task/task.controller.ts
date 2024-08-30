@@ -7,6 +7,8 @@ import { RolesGuard } from 'src/auth/guard/role/roles.guard';
 import { Roles } from 'src/auth/guard/role/roles.decorator';
 import { UserRequest } from 'src/request/user-request.interface';
 import { TaskDtoCreate } from './dto/task-dto-create';
+import { plainToInstance } from 'class-transformer';
+import { TaskDtoUpdateProgress } from './dto/task-dto-update-progress';
 
 @Controller('task')
 export class TaskController {
@@ -21,14 +23,18 @@ export class TaskController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles('user', 'admin')
   @Put('edit/:id')
-  async edit(@Req() request: UserRequest, @Body() taskDto: TaskDtoUpdate, @Param('id') id: number) {
+  async edit(@Req() request: UserRequest, @Body() taskDto: TaskDtoUpdate | TaskDtoUpdateProgress, @Param('id') id: number) {
     const current_user = request.user as { userId: number}
     const taskEdit = await this.taskService.getTaskById(id)
-    if (current_user.userId !== taskEdit.admin.id) {
-      throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+
+    if (taskDto.hasOwnProperty('title')) {
+      if (current_user.userId !== taskEdit.admin.id) {
+        throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+      }
     }
+
     return this.taskService.edit(taskDto, id)
   }
 

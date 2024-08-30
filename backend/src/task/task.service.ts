@@ -6,6 +6,7 @@ import { TaskDtoUpdate } from "src/task/dto/task-dto-update";
 import { Task } from "src/task/entities/task.entity";
 import { Repository } from "typeorm";
 import { TaskDtoCreate } from "./dto/task-dto-create";
+import { TaskDtoUpdateProgress } from "./dto/task-dto-update-progress";
 
 @Injectable()
 export class TaskService {
@@ -32,20 +33,28 @@ export class TaskService {
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
 
-  async edit(taskDto: TaskDtoUpdate, id: number) {
+  async edit(taskDto: TaskDtoUpdate | TaskDtoUpdateProgress, id: number) {
     const existingTask = await this.taskRepository.findOne({
       where: { id: id },
       relations: ['user']
     });
-
+  
     if (!existingTask) {
       throw new BadRequestException(`Задачи с id: ${id} не существует`);
     }
-
-    const updatedTask = plainToInstance(Task, { ...existingTask, ...taskDto });
-
+  
+    let updatedTask: Task;
+  
+    if ('id' in taskDto) {
+      // Handle TaskDtoUpdate
+      updatedTask = plainToInstance(Task, { ...existingTask, ...taskDto });
+    } else {
+      // Handle TaskDtoUpdateProgress
+      updatedTask = plainToInstance(Task, { ...existingTask, ...taskDto });
+    }
+  
     await this.taskRepository.save(updatedTask);
-
+  
     const savedTask = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] })
     return plainToInstance(TaskDto, savedTask, { excludeExtraneousValues: true });
   }
