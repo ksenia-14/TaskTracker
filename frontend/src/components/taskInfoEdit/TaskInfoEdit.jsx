@@ -17,6 +17,7 @@ const TaskInfoEdit = () => {
   });
   const [taskState, setTaskState] = useState('new');
   const [usersList, setUsersList] = useState([]);
+  const [error, setError] = useState('');
 
   const { axiosGetTaskById, axiosGetUsersList, axiosEditTaskById } = useContext(ApiContext);
   const navigate = useNavigate();
@@ -69,8 +70,14 @@ const TaskInfoEdit = () => {
 
   const saveTask = async (event) => {
     event.preventDefault();
-    await axiosEditTaskById(id, task);
-    navigate('/admin/task-list');
+    try {
+      const updatedTask = await axiosEditTaskById(id, task);
+      navigate(`/admin/task-info/${updatedTask.id}`);
+    } catch (error) {
+      const errorMessages = error.response.data.message;
+      const errorMessage = Array.isArray(errorMessages) ? errorMessages.join(', ') : errorMessages;
+      setError(errorMessage);
+    }
   };
 
   const closeTask = (event) => {
@@ -182,6 +189,7 @@ const TaskInfoEdit = () => {
           <button type="button" onClick={closeTask}>Отменить</button>
         </div>
 
+        <div className={style.error}>{error}</div>
       </div>
     </form>
   )

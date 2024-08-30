@@ -38,13 +38,12 @@ const CreateTaskForm = () => {
   const createTask = async (event) => {
     event.preventDefault();
     try {
-      await axiosCreateTask(task)
-      navigate('/admin/task-list');
+      const createdTask = await axiosCreateTask(task)
+      navigate(`/admin/task-info/${createdTask.id}`);
     } catch (error) {
       const errorMessages = error.response.data.message;
       const errorMessage = Array.isArray(errorMessages) ? errorMessages.join(', ') : errorMessages;
       setError(errorMessage);
-      console.error('Login failed:', error);
     }
   };
 
