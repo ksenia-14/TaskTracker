@@ -9,6 +9,7 @@ const AuthorizationForm = () => {
   const [role, setRole] = useState('admin');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
@@ -37,6 +38,8 @@ const AuthorizationForm = () => {
         }
       }
     } catch (error) {
+      const errorMessage = error.response ? error.response.data.message : 'Некорректные логин или пароль';
+      setError(errorMessage);
       console.error('Login failed:', error);
     }
   };
@@ -68,6 +71,7 @@ const AuthorizationForm = () => {
           onChange={(e) => setPassword(e.target.value)}
         ></input>
         <button type="submit">Войти</button>
+      <div className={style.error}>{error}</div>
       </div>
     </form>
   )

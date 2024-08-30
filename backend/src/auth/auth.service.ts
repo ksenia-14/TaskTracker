@@ -12,7 +12,7 @@ export class AuthService {
   async signIn(login: string, pass: string): Promise<any> {
     const user = await this.userService.findUserByLogin(login);
     if (user?.password !== pass) {
-      throw new UnauthorizedException('Неверный логин или пароль');
+      throw new UnauthorizedException('Некорректные логин или пароль');
     }
     const payload = { sub: user.id, username: user.login, roles: user.roles };
     return {

@@ -13,6 +13,7 @@ const CreateTaskForm = () => {
     user: null,
     description: ''
   })
+  const [error, setError] = useState('');
 
   const { axiosCreateTask, axiosGetUsersList } = useContext(ApiContext);
   const navigate = useNavigate();
@@ -36,8 +37,15 @@ const CreateTaskForm = () => {
 
   const createTask = async (event) => {
     event.preventDefault();
-    await axiosCreateTask(task)
-    navigate('/admin/task-list');
+    try {
+      await axiosCreateTask(task)
+      navigate('/admin/task-list');
+    } catch (error) {
+      const errorMessages = error.response.data.message;
+      const errorMessage = Array.isArray(errorMessages) ? errorMessages.join(', ') : errorMessages;
+      setError(errorMessage);
+      console.error('Login failed:', error);
+    }
   };
 
   const closeTask = (event) => {
@@ -98,6 +106,7 @@ const CreateTaskForm = () => {
           ></textarea>
         <button type="submit">Сохранить</button>
         <button type="button" onClick={closeTask}>Отменить</button>
+        <div className={style.error}>{error}</div>
       </div>
 
     </form>

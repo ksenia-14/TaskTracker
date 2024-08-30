@@ -6,7 +6,6 @@ import { TaskDtoUpdate } from "src/task/dto/task-dto-update";
 import { Task } from "src/task/entities/task.entity";
 import { Repository } from "typeorm";
 import { TaskDtoCreate } from "./dto/task-dto-create";
-import { UserService } from "src/user/user.service";
 
 @Injectable()
 export class TaskService {
@@ -78,7 +77,6 @@ export class TaskService {
 
   async getTaskById(id: number): Promise<TaskDto> {
     const task = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] });
-    console.log(task)
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
 

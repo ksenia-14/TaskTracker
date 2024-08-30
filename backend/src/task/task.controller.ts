@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Put, Req, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { TaskDto } from './dto/task-dto';
 import { TaskDtoUpdate } from './dto/task-dto-update';
@@ -27,7 +27,7 @@ export class TaskController {
     const current_user = request.user as { userId: number}
     const taskEdit = await this.taskService.getTaskById(id)
     if (current_user.userId !== taskEdit.admin.id) {
-      return {'error': 'Not access'}
+      throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
     }
     return this.taskService.edit(taskDto, id)
   }
@@ -39,7 +39,7 @@ export class TaskController {
     const current_user = request.user as { userId: number}
     const taskEdit = await this.taskService.getTaskById(id)
     if (current_user.userId !== taskEdit.admin.id) {
-      return {'error': 'Not access'}
+      throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
     }
     return this.taskService.deleteTaskById(id)
   }

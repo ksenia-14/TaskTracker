@@ -142,10 +142,10 @@ const TaskInfoEdit = () => {
           <select
             name="types"
             id="taskUser"
-            value={task.user ? task.user.id : null}
-            onChange={(e) => handleChange('user', e.target.value)}
+            value={task.user ? task.user.id : ""}
+            onChange={(e) => handleChange('user', e.target.value === "" ? null : e.target.value)}
           >
-            <option value={null}>Не назначен</option>
+            <option value="">Не назначен</option>
             {usersList.map((user) => (
               <option key={user.id} value={user.id}>{user.name}</option>
             ))}
