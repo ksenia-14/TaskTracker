@@ -64,7 +64,7 @@ export class TaskController {
     const user = request.user as { userId: number, roles: string[] }
     const roleUser = user.roles
     if (!roleUser.includes('admin')) {
-      this.taskService.getTaskForUserById(user.userId, id)
+      return this.taskService.getTaskForUserById(user.userId, id)
     }
     return this.taskService.getTaskForAdminById(user.userId, id)
   }
