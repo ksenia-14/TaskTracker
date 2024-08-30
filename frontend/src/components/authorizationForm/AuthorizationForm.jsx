@@ -30,6 +30,7 @@ const AuthorizationForm = () => {
       if (response.status === 200) {
         localStorage.clear();
         localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem('username', login);
 
         if (role === 'admin') {
           navigate('/admin/task-list');
