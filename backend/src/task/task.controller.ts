@@ -51,11 +51,18 @@ export class TaskController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Post('sort')
-  async sort(
+  async sortSet(
     @Body() sortDto: SortDto,
   ) {
     this.taskSortService.setField(sortDto.field)
     this.taskSortService.setOrder(sortDto.order)
+    return {'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder()}
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Get('sort')
+  async sortGet() {
     return {'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder()}
   }
 

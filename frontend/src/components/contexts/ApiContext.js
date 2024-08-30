@@ -13,9 +13,10 @@ const ApiProvider = ({ children }) => {
     }
   });
 
-  const handleRequest = async (method, url, data = null) => {
+  const handleRequest = async (method, url, data = null, params = null) => {
     try {
-      const response = await instance[method](url, data);
+      const config = params;
+      const response = await instance[method](url, data, config);
       return response.data;
     } catch (error) {
       console.error(`${method.toUpperCase()} request failed:`, error);
@@ -29,7 +30,12 @@ const ApiProvider = ({ children }) => {
   
   const axiosCreateTask = (task) => handleRequest('put', ENDPOINTS.TASKS_CREATE, task);
   
+  const axiosGetSortTask = () => handleRequest('get', ENDPOINTS.TASKS_SORT);
+  const axiosSetSortTask = (sort) => handleRequest('post', ENDPOINTS.TASKS_SORT, sort);
+
   const axiosGetAllTasks = () => handleRequest('get', ENDPOINTS.TASKS_GET_ALL);
+  const axiosFilter = (filter) => handleRequest('get', ENDPOINTS.TASKS_FILTER, null, filter);
+
   const axiosGetUsersList = () => handleRequest('get', ENDPOINTS.USERS_GET);
 
   return (
@@ -41,6 +47,11 @@ const ApiProvider = ({ children }) => {
       axiosCreateTask,
       
       axiosGetAllTasks,
+      axiosFilter,
+
+      axiosGetSortTask,
+      axiosSetSortTask,
+
       axiosGetUsersList,
     }}
     >
