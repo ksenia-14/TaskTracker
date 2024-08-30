@@ -25,7 +25,7 @@ function App() {
           <Route path="/admin/create-new-task" element={<NewTaskPage />} />
           <Route path="/admin/task-info/:id" element={<TaskInfoPage />} />
           <Route path="/admin/task-edit/:id" element={<TaskInfoEditPage />} />
-          <Route path="/admin/task-worklog" element={<TasksWorklogPage />} />
+          <Route path="/admin/task-worklog/:id" element={<TasksWorklogPage />} />
           <Route path="/user/task-list" element={<TaskUserListPage />} />
           <Route path="/user/task-info/:id" element={<TaskUserInfoPage />} />
           <Route path="/user/task-complete/:id" element={<TaskUserCompletePage />} />

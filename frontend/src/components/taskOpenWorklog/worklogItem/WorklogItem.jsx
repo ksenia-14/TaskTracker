@@ -1,12 +1,13 @@
 import React from 'react';
 import style from './worklogItem.module.scss';
+import moment from 'moment';
 
-const WorklogItem = () => {
+const WorklogItem = ({id, user, progress, date}) => {
   return (
     <div className={style["item"]}>
-      <p>Иванов</p>
-      <p>50%</p>
-      <p>21.08.2024</p>
+      <p>{user}</p>
+      <p>{progress}%</p>
+      <p>{moment(date).format('DD.MM.YYYY')}</p>
     </div>
   )
 }

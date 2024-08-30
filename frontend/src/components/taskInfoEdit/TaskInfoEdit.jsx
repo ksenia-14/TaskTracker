@@ -54,7 +54,7 @@ const TaskInfoEdit = () => {
   };
 
   const checkTaskState = (progress) => {
-    setTaskState(progress === 0 ? 'new' : progress === 100 ? 'done' : 'in_process');
+    setTaskState(progress == 0 ? 'new' : progress == 100 ? 'done' : 'in_process');
   };
 
   const checkTaskProgress = (state) => {
@@ -62,7 +62,7 @@ const TaskInfoEdit = () => {
       handleChange('progress', 0);
     } else if (state === 'done') {
       handleChange('progress', 100);
-    } else if (task.progress === 0 || task.progress === 100) {
+    } else if (task.progress == 0 || task.progress == 100) {
       handleChange('progress', 50);
     }
   };
