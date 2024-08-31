@@ -4,7 +4,7 @@ import { IsDate, IsNotEmpty, IsOptional } from "class-validator"
 import { UserDto } from "src/user/dto/user-dto"
 import { User } from "src/user/entities/user.entity" 
 
-export class TaskDto {
+export class TaskDtoWorklog {
   @Expose()
   @Optional()
   id: number
@@ -34,13 +34,4 @@ export class TaskDto {
   @IsNotEmpty()
   @Transform(({ value }: TransformFnParams) => value.toISOString().split('T')[0])
   executeAt: string
-
-  @Expose()
-  @Type(() => UserDto)
-  user: UserDto
-
-  @Expose()
-  @IsNotEmpty()
-  @Type(() => UserDto)
-  admin: UserDto
 }

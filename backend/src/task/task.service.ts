@@ -9,6 +9,7 @@ import { TaskDtoCreate } from "./dto/task-dto-create";
 import { TaskDtoUpdateProgress } from "./dto/task-dto-update-progress";
 import { TaskDtoFilter } from "./dto/task-dto-filter";
 import { TaskSortService } from "./task-sort.service";
+import { WorklogService } from "src/worklog/worklog.service";
 
 @Injectable()
 export class TaskService {
@@ -16,7 +17,8 @@ export class TaskService {
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
     private readonly taskSortService: TaskSortService,
-  ) { }
+    private readonly worklogService: WorklogService,
+  ) {}
 
   async create(taskDto: TaskDtoCreate, id_admin: number) {
     const isExist = await this.taskRepository.findBy({
@@ -32,6 +34,8 @@ export class TaskService {
 
     const newTask = plainToInstance(Task, taskDto)
     const task = await this.taskRepository.save(newTask)
+
+    await this.worklogService.create(task)
 
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
@@ -50,6 +54,9 @@ export class TaskService {
     await this.taskRepository.save(updatedTask);
 
     const savedTask = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] })
+    
+    await this.worklogService.create(savedTask)
+    
     return plainToInstance(TaskDto, savedTask, { excludeExtraneousValues: true });
   }
 

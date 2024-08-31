@@ -1,9 +1,10 @@
+import { Optional } from "@nestjs/common"
 import { Transform, TransformFnParams, Type } from "class-transformer"
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator"
 import { User } from "src/user/entities/user.entity" 
 
 export class TaskDtoUpdate {
-  @IsNotEmpty({ message: 'поле id не должно быть пустым' })
+  @Optional()
   id: number
 
   @IsNotEmpty({ message: 'поле заголовка не должно быть пустым' })
@@ -28,7 +29,7 @@ export class TaskDtoUpdate {
   @IsNotEmpty({ message: 'поле описания не должно быть пустым' })
   description: string
 
-  @IsOptional()
+  @IsNotEmpty({ message: 'необходимо назначить исполнителя' })
   user: string
 
   @IsOptional()

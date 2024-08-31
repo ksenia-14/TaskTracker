@@ -25,7 +25,7 @@ export class TaskController {
   @Roles('admin')
   @Put('create')
   create(@Req() request: UserRequest, @Body() taskDto: TaskDtoCreate) {
-    const current_user = request.user as { userId: number}
+    const current_user = request.user as { userId: number }
     return this.taskService.create(taskDto, current_user.userId)
   }
 
@@ -36,7 +36,7 @@ export class TaskController {
     @Req() request: UserRequest,
     @Query() query: TaskDtoFilter,
   ) {
-    const current_user = request.user as { userId: number}
+    const current_user = request.user as { userId: number }
     const admin_id = current_user.userId
     const queryInstance = plainToInstance(TaskDtoFilter, query);
     const errors = await validate(queryInstance);
@@ -56,27 +56,45 @@ export class TaskController {
   ) {
     this.taskSortService.setField(sortDto.field)
     this.taskSortService.setOrder(sortDto.order)
-    return {'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder()}
+    return { 'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder() }
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Get('sort')
   async sortGet() {
-    return {'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder()}
+    return { 'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder() }
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('user', 'admin')
   @Put('edit/:id')
   async edit(@Req() request: UserRequest, @Body() taskDto: TaskDtoUpdate | TaskDtoUpdateProgress, @Param('id') id: number) {
-    const current_user = request.user as { userId: number}
-    const taskEdit = await this.taskService.getTaskById(id)
+    const current_user = request.user as { userId: number, roles: string[] }
+    const roles = current_user.roles
 
-    if (taskDto.hasOwnProperty('title')) {
+    const taskEdit = await this.taskService.getTaskById(id)
+    let task: TaskDtoUpdate | TaskDtoUpdateProgress
+
+    if (roles.includes('admin')) {
       if (current_user.userId !== taskEdit.admin.id) {
         throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
       }
+      task = plainToInstance(TaskDtoUpdate, taskDto)
+    } else {
+      if (current_user.userId !== taskEdit.user.id) {
+        throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+      }
+      task = plainToInstance(TaskDtoUpdateProgress, taskDto)
+    }
+    const errors = await validate(task);
+
+    if (errors.length > 0) {
+      const errorsStr = errors.map(error => {
+        const constraints = Object.values(error.constraints || {});
+        return constraints.join(', ');
+      }).join(', ');
+      throw new BadRequestException(errorsStr);
     }
 
     return this.taskService.edit(taskDto, id)
@@ -86,7 +104,7 @@ export class TaskController {
   @Roles('admin')
   @Delete('delete/:id')
   async delete(@Req() request: UserRequest, @Param('id') id: number) {
-    const current_user = request.user as { userId: number}
+    const current_user = request.user as { userId: number }
     const taskEdit = await this.taskService.getTaskById(id)
     if (current_user.userId !== taskEdit.admin.id) {
       throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);

@@ -31,7 +31,7 @@ export class TaskDtoCreate {
   executeAt: Date
 
   @Expose()
-  @IsOptional()
+  @IsNotEmpty({ message: 'необходимо назначить исполнителя' })
   user: number
 
   @Expose()

@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Task } from "src/task/entities/task.entity";
+import { Worklog } from "src/worklog/entities/worklog.entity";
 
 @Entity()
 export class User {
@@ -23,5 +24,8 @@ export class User {
 
   @OneToMany(() => Task, (task) => task.user, { onDelete: 'SET NULL' })
   tasks_admin: Task[]
+
+  @OneToMany(() => Worklog, (worklog) => worklog.user, { onDelete: 'NO ACTION' })
+  worklog: Worklog[]
 }
 
