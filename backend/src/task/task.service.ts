@@ -46,16 +46,20 @@ export class TaskService {
       relations: ['user']
     });
 
+    const oldProgress = existingTask.progress
+
     if (!existingTask) {
       throw new BadRequestException(`Задачи с id: ${id} не существует`);
     }
-
+    
     const updatedTask: Task = plainToInstance(Task, { ...existingTask, ...taskDto });
     await this.taskRepository.save(updatedTask);
-
+    
     const savedTask = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] })
     
-    await this.worklogService.create(savedTask)
+    if(oldProgress != savedTask.progress) {
+      await this.worklogService.create(savedTask)
+    }
     
     return plainToInstance(TaskDto, savedTask, { excludeExtraneousValues: true });
   }
