@@ -12,7 +12,7 @@ const TaskOpenWorklog = () => {
   const [taskState, setTaskState] = useState([]);
   const [worklog, setWorklog] = useState([]);
 
-  const { axiosGetTaskById } = useContext(ApiContext);
+  const { axiosGetTaskById, axiosWorklogByTaskId } = useContext(ApiContext);
 
   const navigate = useNavigate();
 
@@ -32,33 +32,15 @@ const TaskOpenWorklog = () => {
     }
   }
 
-  const getWorklog = () => {
-    const worklog = [
-      {
-        id: 1,
-        user: "user 1",
-        progress: "0",
-        date: "2024-02-02"
-      },
-      {
-        id: 2,
-        user: "user 2",
-        progress: "50",
-        date: "2024-02-02"
-      },
-      {
-        id: 3,
-        user: "user 3",
-        progress: "100",
-        date: "2024-02-02"
-      }
-    ];
-    setWorklog(worklog)
+  const getWorklog = async (id) => {
+    const worklogTask = await axiosWorklogByTaskId(id)
+    setWorklog(worklogTask)
+    console.log(worklogTask)
   }
 
   React.useEffect(() => {
     getTask(id)
-    getWorklog()
+    getWorklog(id)
   }, [id])
   
   return (
@@ -84,7 +66,7 @@ const TaskOpenWorklog = () => {
       {worklog.map((worklog_item) => (
         <WorklogItem 
           key={worklog_item.id}  
-          user={worklog_item.user}  
+          user={worklog_item.user ? worklog_item.user.name : ""}  
           progress={worklog_item.progress}  
           date={worklog_item.date}  
         />

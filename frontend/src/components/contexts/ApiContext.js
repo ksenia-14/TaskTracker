@@ -36,6 +36,8 @@ const ApiProvider = ({ children }) => {
   const axiosGetAllTasks = () => handleRequest('get', ENDPOINTS.TASKS_GET_ALL);
   const axiosFilter = (filter) => handleRequest('get', ENDPOINTS.TASKS_FILTER, null, filter);
 
+  const axiosWorklogByTaskId = (id) => handleRequest('get', ENDPOINTS.WORKLOG_GET(id));
+
   const axiosGetUsersList = () => handleRequest('get', ENDPOINTS.USERS_GET);
 
   return (
@@ -51,6 +53,8 @@ const ApiProvider = ({ children }) => {
 
       axiosGetSortTask,
       axiosSetSortTask,
+
+      axiosWorklogByTaskId,
 
       axiosGetUsersList,
     }}
