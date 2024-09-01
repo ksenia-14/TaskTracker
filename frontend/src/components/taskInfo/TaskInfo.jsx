@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-import axios from "axios";
 import moment from 'moment';
 import style from './taskInfo.module.scss';
-import { ENDPOINTS } from '../../apiConfig';
 import { ApiContext } from '../contexts/ApiContext';
 import { useContext } from 'react';
+import SubtaskItem from '../subtaskItem/SubtaskItem';
 
 const TaskInfo = () => {
   const { id } = useParams();
@@ -34,6 +33,10 @@ const TaskInfo = () => {
     navigate('/admin/task-list');
   };
 
+  const editSubtasks = () => {
+    navigate(`/admin/subtasks/${id}`);
+  };
+
   const getTask = async (id) => {
     const task = await axiosGetTaskById(id)
     setTask(task)
@@ -49,7 +52,7 @@ const TaskInfo = () => {
   React.useEffect(() => {
     getTask(id)
   }, [id])
-  
+
   return (
     <div className={style["task"]}>
       <div className={style["header"]}>
@@ -70,8 +73,31 @@ const TaskInfo = () => {
           <button onClick={openWorkLog}>Журнал работ</button>
           <button onClick={editTask}>Редактировать</button>
           <button onClick={deleteTask}>Удалить</button>
+          {
+            task.type === 'Epic' || task.type === 'Milestone' ?
+              <button onClick={editSubtasks}>Добавить подзадачи</button>
+              : null
+          }
         </div>
       </div>
+
+      {Array.isArray(task.subtask) && task.subtask.length > 0 > 0 ? <p>Подзадачи</p> : null}
+
+      {task.subtask ?
+        task.subtask.map((subtask) => (
+          <div key={subtask.id} className={style["item-subtask"]}>
+            <SubtaskItem
+              id={subtask.id}
+              title={subtask.title}
+              type={subtask.type}
+              progress={subtask.progress}
+              user={subtask.user ? subtask.user.login : 'Не назначен'}
+            />
+          </div>
+        ))
+        :
+        null
+      }
     </div>
   )
 }

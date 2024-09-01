@@ -82,7 +82,7 @@ const TaskInfoEdit = () => {
 
   const closeTask = (event) => {
     event.preventDefault();
-    navigate('/admin/task-list');
+    navigate(`/admin/task-info/${id}`);
   };
 
   return (

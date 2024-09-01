@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import style from './taskUserInfo.module.scss';
 import { ApiContext } from '../contexts/ApiContext';
 import moment from 'moment';
+import SubtaskItem from '../subtaskItem/SubtaskItem';
 
 const TaskUserInfo = () => {
   const { id } = useParams();
@@ -13,11 +14,11 @@ const TaskUserInfo = () => {
 
   const navigate = useNavigate();
 
-  const closeTask = (event) => {
+  const closeTask = () => {
     navigate('/user/task-list');
   };
 
-  const completeTask = (event) => {
+  const completeTask = () => {
     navigate(`/user/task-complete/${id}`);
   };
 
@@ -57,6 +58,25 @@ const TaskUserInfo = () => {
           <button onClick={completeTask}>Завершить</button>
         </div>
       </div>
+
+      {Array.isArray(task.subtask) && task.subtask.length > 0 > 0 ? <p>Подзадачи</p> : null}
+
+      {task.subtask ?
+        task.subtask.map((subtask) => (
+          <div className={style["subtask"]} key={subtask.id}>
+            <SubtaskItem
+              id={subtask.id}
+              title={subtask.title}
+              type={subtask.type}
+              progress={subtask.progress}
+              user={subtask.user ? subtask.user.login : 'Не назначен'}
+            />
+          </div>
+        ))
+        :
+        null
+      }
+
     </div>
   )
 }

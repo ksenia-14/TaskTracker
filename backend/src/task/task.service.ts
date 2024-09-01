@@ -72,6 +72,15 @@ export class TaskService {
     return plainToInstance(TaskDto, savedTask, { excludeExtraneousValues: true });
   }
 
+  async removeSubtasks(parent_task_id:number) {
+    const parentTask = await this.taskRepository.findOne({ where: { id: parent_task_id }})
+    if (!parentTask) {
+      throw new NotFoundException(`Задача с id: ${parent_task_id} не найдена`);
+    }
+    parentTask.subtask = []
+    await this.taskRepository.save(parentTask);
+  }
+
   async addSubtask(subtask_id: number, parent_task_id:number) {
     const subtask = await this.taskRepository.findOne({ where: { id: subtask_id }})
     const parentTask = await this.taskRepository.findOne({ where: { id: parent_task_id }})

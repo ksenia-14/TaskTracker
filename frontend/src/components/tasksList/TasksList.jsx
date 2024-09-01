@@ -27,7 +27,7 @@ const TaskList = () => {
     axiosGetUsersList,
     axiosGetSortTask,
     axiosSetSortTask,
-    axiosFilter,
+    // axiosFilter,
   } = useContext(ApiContext);
 
   const navigate = useNavigate();

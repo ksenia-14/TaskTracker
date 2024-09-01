@@ -34,6 +34,8 @@ const ApiProvider = ({ children }) => {
 
   const axiosGetAllTasks = () => handleRequest('get', ENDPOINTS.TASKS_GET_ALL);
   const axiosFilter = (filter) => handleRequest('get', ENDPOINTS.TASKS_FILTER, null, filter);
+  
+  const axiosSetSubtasks = (id, subtasks) => handleRequest('post', ENDPOINTS.TASKS_SUBTASK(id), subtasks);
 
   const axiosWorklogByTaskId = (id) => handleRequest('get', ENDPOINTS.WORKLOG_GET(id));
 
@@ -52,6 +54,8 @@ const ApiProvider = ({ children }) => {
 
       axiosGetSortTask,
       axiosSetSortTask,
+
+      axiosSetSubtasks,
 
       axiosWorklogByTaskId,
 

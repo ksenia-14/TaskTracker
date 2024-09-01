@@ -1,0 +1,39 @@
+.task {
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  background-color: #e2f8ff;
+  padding: 55px;
+  margin: 45px;
+  border-radius: 20px;
+
+  .header {
+    display: grid;
+    grid-template-columns: 1fr max-content;
+    align-content: center;
+    margin-bottom: 20px;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .button-save {
+    margin-top: 40px;
+    height: 100px;
+  }
+}
+
+.items {
+  display: grid;
+  gap: 20px
+}
+
+.with-checkbox {
+  display: grid;
+  grid-template-columns: min-content 1fr;
+
+  input {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+  }
+}

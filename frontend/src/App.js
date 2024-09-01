@@ -9,11 +9,12 @@ import TaskListPage from './pages/adminPages/TasksListPage';
 import NewTaskPage from './pages/adminPages/NewTaskPage';
 import TaskInfoPage from './pages/adminPages/TaskInfoPage';
 import TaskInfoEditPage from './pages/adminPages/TaskInfoEditPage';
-import TasksWorklogPage from './pages/adminPages/TasksWorklogPage';
+import TasksWorklogPage from './pages/adminPages/TasksEditSubtasks';
 import TaskUserListPage from './pages/userPages/TaskUserListPage';
 import TaskUserInfoPage from './pages/userPages/TaskUserInfoPage';
 import TaskUserCompletePage from './pages/userPages/TaskUserCompletePage';
 import { ApiProvider } from './components/contexts/ApiContext';
+import TasksEditSubtasks from './pages/adminPages/TasksEditSubtasks';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/admin/task-info/:id" element={<TaskInfoPage />} />
           <Route path="/admin/task-edit/:id" element={<TaskInfoEditPage />} />
           <Route path="/admin/task-worklog/:id" element={<TasksWorklogPage />} />
+          <Route path="/admin/subtasks/:id" element={<TasksEditSubtasks />} />
           <Route path="/user/task-list" element={<TaskUserListPage />} />
           <Route path="/user/task-info/:id" element={<TaskUserInfoPage />} />
           <Route path="/user/task-complete/:id" element={<TaskUserCompletePage />} />

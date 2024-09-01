@@ -10,6 +10,7 @@ export const ENDPOINTS = {
   TASKS_EDIT: (id) => `${API_BASE_URL}/task/edit/${id}`,
   TASKS_DELETE: (id) => `${API_BASE_URL}/task/delete/${id}`,
   TASKS_GET: (id) => `${API_BASE_URL}/task/get/${id}`,
+  TASKS_SUBTASK: (id) => `${API_BASE_URL}/task/subtask/${id}`,
   WORKLOG_GET: (id) => `${API_BASE_URL}/worklog/${id}`,
 
   USERS_GET: `${API_BASE_URL}/user/users-list`,

@@ -69,7 +69,7 @@ export class TaskController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Post('subtask/:parent_task_id')
-  async addSubtasks(
+  async editSubtasks(
     @Req() request: UserRequest,
     @Body('subtask_id_array') subtask_id_array: number[],
     @Param('parent_task_id') parent_task_id: number,
@@ -81,6 +81,7 @@ export class TaskController {
     if (!parentTask) {
       throw new NotFoundException(`Задача с id: ${parent_task_id} не найдена или недоступна`);
     }
+    this.taskService.removeSubtasks(parent_task_id)
 
     for (const subtask_id of subtask_id_array) {
       const subtask = await this.taskService.getTaskForAdminById(admin_id, subtask_id);
@@ -92,17 +93,6 @@ export class TaskController {
       await this.taskService.addSubtask(subtask_id, parent_task_id);
     }
     return parentTask;
-  }
-
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
-  @Post('subtask/:parent_task_id')
-  async removeSubtasks(
-    @Req() request: UserRequest,
-    @Body('subtask_id_array') subtask_id_array: number[],
-    @Param('parent_task_id') parent_task_id: number,
-  ) {
-
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
