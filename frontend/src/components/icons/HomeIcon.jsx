@@ -4,7 +4,8 @@ const HomeIcon = () => {
   const navigate = useNavigate();
 
   const goToHomepage = (event) => {
-    navigate('/authorization');
+    localStorage.clear();
+    navigate('/authorization')
   };
 
   return (
