@@ -11,7 +11,7 @@ export class Worklog {
   @JoinColumn({ name: 'user_id' })
   user:User
 
-  @ManyToOne(() => Task, (task) => task.worklog)
+  @ManyToOne(() => Task, (task) => task.worklog, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'task_id' })
   task:Task
 

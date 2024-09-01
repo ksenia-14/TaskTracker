@@ -34,6 +34,6 @@ export class Task {
   @JoinColumn({ name: 'admin_id' })
   admin:User
 
-  @OneToMany(() => Worklog, (worklog) => worklog.task, { onDelete: 'NO ACTION' })
+  @OneToMany(() => Worklog, (worklog) => worklog.task, { onDelete: 'CASCADE' })
   worklog: Worklog[]
 }

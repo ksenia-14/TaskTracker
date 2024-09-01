@@ -25,7 +25,7 @@ export class User {
   @OneToMany(() => Task, (task) => task.user, { onDelete: 'SET NULL' })
   tasks_admin: Task[]
 
-  @OneToMany(() => Worklog, (worklog) => worklog.user, { onDelete: 'NO ACTION' })
+  @OneToMany(() => Worklog, (worklog) => worklog.user, { onDelete: 'CASCADE' })
   worklog: Worklog[]
 }
 
