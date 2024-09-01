@@ -1,18 +1,18 @@
-import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, HttpException, HttpStatus, NotFoundException, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { TaskDto } from './dto/task-dto';
 import { TaskDtoUpdate } from './dto/task-dto-update';
 import { JwtAuthGuard } from 'src/auth/guard/jwt/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guard/role/roles.guard';
 import { Roles } from 'src/auth/guard/role/roles.decorator';
 import { UserRequest } from 'src/request/user-request.interface';
 import { TaskDtoCreate } from './dto/task-dto-create';
-import { plainToClass, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 import { TaskDtoUpdateProgress } from './dto/task-dto-update-progress';
 import { validate } from 'class-validator';
 import { TaskSortService } from './task-sort.service';
-import { SortDto } from './dto/sort-dto';
+import { TaskSortDto } from './dto/task-sort-dto';
 import { TaskDtoFilter } from './dto/task-dto-filter';
+import { TaskDto } from './dto/task-dto';
 
 @Controller('task')
 export class TaskController {
@@ -52,7 +52,7 @@ export class TaskController {
   @Roles('admin')
   @Post('sort')
   async sortSet(
-    @Body() sortDto: SortDto,
+    @Body() sortDto: TaskSortDto,
   ) {
     this.taskSortService.setField(sortDto.field)
     this.taskSortService.setOrder(sortDto.order)
@@ -64,6 +64,45 @@ export class TaskController {
   @Get('sort')
   async sortGet() {
     return { 'field': this.taskSortService.getField(), 'order': this.taskSortService.getOrder() }
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Post('subtask/:parent_task_id')
+  async addSubtasks(
+    @Req() request: UserRequest,
+    @Body('subtask_id_array') subtask_id_array: number[],
+    @Param('parent_task_id') parent_task_id: number,
+  ) {
+    const current_user = request.user as { userId: number };
+    const admin_id = current_user.userId;
+
+    const parentTask = await this.taskService.getTaskForAdminById(admin_id, parent_task_id);
+    if (!parentTask) {
+      throw new NotFoundException(`Задача с id: ${parent_task_id} не найдена или недоступна`);
+    }
+
+    for (const subtask_id of subtask_id_array) {
+      const subtask = await this.taskService.getTaskForAdminById(admin_id, subtask_id);
+
+      if (!subtask) {
+        throw new NotFoundException(`Задача с id: ${subtask_id} не найдена или недоступна`);
+      }
+
+      await this.taskService.addSubtask(subtask_id, parent_task_id);
+    }
+    return parentTask;
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Post('subtask/:parent_task_id')
+  async removeSubtasks(
+    @Req() request: UserRequest,
+    @Body('subtask_id_array') subtask_id_array: number[],
+    @Param('parent_task_id') parent_task_id: number,
+  ) {
+
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

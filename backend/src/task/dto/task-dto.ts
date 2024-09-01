@@ -3,6 +3,8 @@ import { Expose, Transform, TransformFnParams, Type } from "class-transformer"
 import { IsDate, IsNotEmpty, IsOptional } from "class-validator"
 import { UserDto } from "src/user/dto/user-dto"
 import { User } from "src/user/entities/user.entity" 
+import { Task } from "../entities/task.entity"
+import { TaskDtoSubtask } from "./task-dto-subtask"
 
 export class TaskDto {
   @Expose()
@@ -43,4 +45,14 @@ export class TaskDto {
   @IsNotEmpty()
   @Type(() => UserDto)
   admin: UserDto
+
+  @Expose()
+  @IsOptional()
+  @Type(() => TaskDtoSubtask)
+  subtask: TaskDtoSubtask[];
+
+  @Expose()
+  @IsOptional()
+  @Type(() => TaskDtoSubtask)
+  subtask_of: TaskDtoSubtask;
 }

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, BeforeUpdate, BeforeInsert } from "typeorm";
 import { User } from "src/user/entities/user.entity";
 import { TaskType } from "../enum/task-type.enum";
 import { Worklog } from "src/worklog/entities/worklog.entity";
@@ -28,7 +28,7 @@ export class Task {
 
   @ManyToOne(() => User, (user) => user.tasks_user, { nullable: true })
   @JoinColumn({ name: 'user_id' })
-  user:User
+  user: User
 
   @ManyToOne(() => User, (user) => user.tasks_admin, { nullable: false })
   @JoinColumn({ name: 'admin_id' })
@@ -36,4 +36,11 @@ export class Task {
 
   @OneToMany(() => Worklog, (worklog) => worklog.task, { onDelete: 'CASCADE' })
   worklog: Worklog[]
+
+  @OneToMany(() => Task, (task) => task.subtask_of)
+  subtask: Task[];
+
+  @ManyToOne(() => Task, (task) => task.subtask)
+  @JoinColumn({ name: 'subtask_of_id' })
+  subtask_of: Task;
 }

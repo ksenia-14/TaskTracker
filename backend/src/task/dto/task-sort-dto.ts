@@ -1,6 +1,6 @@
 import { IsString, IsIn } from 'class-validator';
 
-export class SortDto {
+export class TaskSortDto {
   @IsString()
   @IsIn(['type', 'user', 'progress', 'createdAt', 'executeAt'])
   field: 'type' | 'user' | 'progress' | 'createdAt' | 'executeAt'

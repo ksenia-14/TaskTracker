@@ -10,6 +10,7 @@ import { TaskDtoUpdateProgress } from "./dto/task-dto-update-progress";
 import { TaskDtoFilter } from "./dto/task-dto-filter";
 import { TaskSortService } from "./task-sort.service";
 import { WorklogService } from "src/worklog/worklog.service";
+import { TaskType } from "./enum/task-type.enum";
 
 @Injectable()
 export class TaskService {
@@ -18,7 +19,7 @@ export class TaskService {
     private readonly taskRepository: Repository<Task>,
     private readonly taskSortService: TaskSortService,
     private readonly worklogService: WorklogService,
-  ) {}
+  ) { }
 
   async create(taskDto: TaskDtoCreate, id_admin: number) {
     const isExist = await this.taskRepository.findBy({
@@ -46,22 +47,66 @@ export class TaskService {
       relations: ['user']
     });
 
-    const oldProgress = existingTask.progress
-
     if (!existingTask) {
       throw new BadRequestException(`Задачи с id: ${id} не существует`);
     }
-    
-    const updatedTask: Task = plainToInstance(Task, { ...existingTask, ...taskDto });
-    await this.taskRepository.save(updatedTask);
-    
-    const savedTask = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] })
-    
-    if(oldProgress != savedTask.progress) {
-      await this.worklogService.create(savedTask)
+
+    const oldProgress = existingTask.progress
+    const oldType = existingTask.type
+
+    let updatedTask = plainToInstance(Task, { ...existingTask, ...taskDto });
+
+    if (oldProgress != updatedTask.progress) {
+      await this.worklogService.create(updatedTask)
     }
-    
+    if (oldType != updatedTask.type) {
+      updatedTask.subtask = []
+    }
+
+    await this.taskRepository.save(updatedTask);
+
+    const savedTask = await this.taskRepository.findOne(
+      { where: { id }, 
+      relations: ['user', 'admin', 'subtask', 'subtask_of'] 
+    })
     return plainToInstance(TaskDto, savedTask, { excludeExtraneousValues: true });
+  }
+
+  async addSubtask(subtask_id: number, parent_task_id:number) {
+    const subtask = await this.taskRepository.findOne({ where: { id: subtask_id }})
+    const parentTask = await this.taskRepository.findOne({ where: { id: parent_task_id }})
+
+    if (!subtask) {
+      throw new NotFoundException(`Задача с id: ${subtask_id} не найдена`);
+    }
+    if (!parentTask) {
+      throw new NotFoundException(`Задача с id: ${parent_task_id} не найдена`);
+    }
+
+    this.checkHierarchy(parentTask, subtask)
+
+    subtask.subtask_of = parentTask
+    await this.taskRepository.save(subtask);
+
+    const subtaskSaved = await this.taskRepository.findOne(
+      { where: { id: subtask_id }, 
+      relations: ['user', 'admin', 'subtask', 'subtask_of'] 
+    })
+    return plainToInstance(TaskDto, subtaskSaved, { excludeExtraneousValues: true });
+  }
+
+  checkHierarchy(parentTask: Task, subtask: Task) {
+    if (parentTask.type === TaskType.TASK) {
+      throw new BadRequestException(`Задачи типа Task не могут иметь подзадач`)
+    } else if (parentTask.type === TaskType.EPIC) {
+      if (subtask.type !== TaskType.TASK) 
+        throw new BadRequestException(`Задачи типа Epic не могут иметь подзадач типа ${subtask.type}`)
+    } else if (parentTask.type === TaskType.MILESTONE) {
+      if (subtask.type !== TaskType.EPIC)
+        throw new BadRequestException(`Задачи типа Milestone не могут иметь подзадач типа ${subtask.type}`)
+    } else {
+      throw new BadRequestException(`Тип задачи ${parentTask.type} не существует`)
+    }
   }
 
   async getAllTasks(): Promise<TaskDto[]> {
@@ -69,7 +114,7 @@ export class TaskService {
     const sortOrder = this.taskSortService.getOrder()
 
     const findOptions: any = {
-      relations: ['user', 'admin'],
+      relations: ['user', 'admin', 'subtask', 'subtask_of'],
       order: {
         [sortBy]: sortOrder
       }
@@ -87,7 +132,7 @@ export class TaskService {
       where: {
         user: { id: user_id }
       },
-      relations: ['user', 'admin'],
+      relations: ['user', 'admin', 'subtask', 'subtask_of'],
       order: {
         [sortBy]: sortOrder
       }
@@ -105,18 +150,21 @@ export class TaskService {
       where: {
         admin: { id: admin_id }
       },
-      relations: ['user', 'admin'],
+      relations: ['user', 'admin', 'subtask', 'subtask_of'],
       order: {
         [sortBy]: sortOrder
       }
     }
-  
+
     const tasks = await this.taskRepository.find(findOptions);
     return plainToInstance(TaskDto, tasks, { excludeExtraneousValues: true });
   }
 
   async getTaskById(id: number): Promise<TaskDto> {
-    const task = await this.taskRepository.findOne({ where: { id }, relations: ['user', 'admin'] });
+    const task = await this.taskRepository.findOne({ 
+      where: { id }, 
+      relations: ['user', 'admin', 'subtask', 'subtask_of'] 
+    });
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
 
@@ -159,7 +207,7 @@ export class TaskService {
         id: task_id,
         user: { id: user_id }
       },
-      relations: ['user', 'admin']
+      relations: ['user', 'admin', 'subtask', 'subtask_of']
     });
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
@@ -170,7 +218,7 @@ export class TaskService {
         id: task_id,
         admin: { id: admin_id }
       },
-      relations: ['user', 'admin']
+      relations: ['user', 'admin', 'subtask', 'subtask_of']
     });
     return plainToInstance(TaskDto, task, { excludeExtraneousValues: true });
   }
