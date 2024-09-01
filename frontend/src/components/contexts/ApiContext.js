@@ -1,19 +1,18 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import axios from "axios";
 import { ENDPOINTS } from '../../apiConfig';
 
 const ApiContext = React.createContext();
 
 const ApiProvider = ({ children }) => {
-  const token = localStorage.getItem('access_token');
-  const instance = axios.create({
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  });
-
   const handleRequest = async (method, url, data = null, params = null) => {
+    const token = localStorage.getItem('access_token');
+    const instance = axios.create({
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     try {
       const config = params;
       const response = await instance[method](url, data, config);
@@ -27,9 +26,9 @@ const ApiProvider = ({ children }) => {
   const axiosGetTaskById = (id) => handleRequest('get', ENDPOINTS.TASKS_GET(id));
   const axiosEditTaskById = (id, task) => handleRequest('put', ENDPOINTS.TASKS_EDIT(id), task);
   const axiosDeleteTaskById = (id) => handleRequest('delete', ENDPOINTS.TASKS_DELETE(id));
-  
+
   const axiosCreateTask = (task) => handleRequest('put', ENDPOINTS.TASKS_CREATE, task);
-  
+
   const axiosGetSortTask = () => handleRequest('get', ENDPOINTS.TASKS_SORT);
   const axiosSetSortTask = (sort) => handleRequest('post', ENDPOINTS.TASKS_SORT, sort);
 
@@ -47,7 +46,7 @@ const ApiProvider = ({ children }) => {
       axiosDeleteTaskById,
 
       axiosCreateTask,
-      
+
       axiosGetAllTasks,
       axiosFilter,
 
