@@ -178,6 +178,9 @@ export class TaskService {
   }
 
   async filter(dto: TaskDtoFilter, admin_id: number) {
+    const sortBy = this.taskSortService.getField()
+    const sortOrder = this.taskSortService.getOrder()
+
     const where: any = {
       admin: { id: admin_id },
     };
@@ -204,7 +207,10 @@ export class TaskService {
 
     const tasks = await this.taskRepository.find({
       where,
-      relations: ['user', 'admin'],
+      relations: ['user', 'admin', 'subtask', 'subtask_of'] ,
+      order: {
+        [sortBy]: sortOrder
+      }
     });
 
     return plainToInstance(TaskDto, tasks, { excludeExtraneousValues: true });
