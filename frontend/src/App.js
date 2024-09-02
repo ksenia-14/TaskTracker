@@ -9,12 +9,12 @@ import TaskListPage from './pages/adminPages/TasksListPage';
 import NewTaskPage from './pages/adminPages/NewTaskPage';
 import TaskInfoPage from './pages/adminPages/TaskInfoPage';
 import TaskInfoEditPage from './pages/adminPages/TaskInfoEditPage';
-import TasksWorklogPage from './pages/adminPages/TasksEditSubtasks';
 import TaskUserListPage from './pages/userPages/TaskUserListPage';
 import TaskUserInfoPage from './pages/userPages/TaskUserInfoPage';
 import TaskUserCompletePage from './pages/userPages/TaskUserCompletePage';
 import { ApiProvider } from './components/contexts/ApiContext';
 import TasksEditSubtasks from './pages/adminPages/TasksEditSubtasks';
+import TasksWorklogPage from './pages/adminPages/TasksWorklogPage';
 
 function App() {
   return (
